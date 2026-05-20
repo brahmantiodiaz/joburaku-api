@@ -20,71 +20,141 @@ function assertRequiredArray(payload, fieldName) {
   }
 }
 
+function pickProfilePayload(body, UserId) {
+  const {
+    fullName,
+    phoneNumber,
+    address,
+    linkedInUrl,
+    imageUrl,
+    professionalSummary,
+  } = body;
+
+  return {
+    UserId,
+    fullName,
+    phoneNumber,
+    address,
+    linkedInUrl,
+    imageUrl,
+    professionalSummary,
+  };
+}
+
+async function createCvCollections(body, UserId, transaction) {
+  const cvSkills = await CvSkill.bulkCreate(
+    body.CvSkills.map((skill) => ({ ...skill, UserId })),
+    { transaction, validate: true },
+  );
+
+  const cvLanguages = await CvLanguage.bulkCreate(
+    body.CvLanguages.map((language) => ({ ...language, UserId })),
+    { transaction, validate: true },
+  );
+
+  const cvWorkExperiences = await CvWorkExperience.bulkCreate(
+    body.CvWorkExperiences.map((workExperience) => ({ ...workExperience, UserId })),
+    { transaction, validate: true },
+  );
+
+  const cvCertifications = await CvCertification.bulkCreate(
+    body.CvCertifications.map((certification) => ({ ...certification, UserId })),
+    { transaction, validate: true },
+  );
+
+  const cvEducations = await CvEducation.bulkCreate(
+    body.CvEducations.map((education) => ({ ...education, UserId })),
+    { transaction, validate: true },
+  );
+
+  return {
+    CvSkills: cvSkills,
+    CvLanguages: cvLanguages,
+    CvWorkExperiences: cvWorkExperiences,
+    CvCertifications: cvCertifications,
+    CvEducations: cvEducations,
+  };
+}
+
+function validateProfilePayload(body) {
+  assertRequiredArray(body, "CvSkills");
+  assertRequiredArray(body, "CvLanguages");
+  assertRequiredArray(body, "CvWorkExperiences");
+  assertRequiredArray(body, "CvCertifications");
+  assertRequiredArray(body, "CvEducations");
+}
+
 class UserProfileController {
-  static async createUserProfile(req, res, next) {
+  static async createProfile(req, res, next) {
     const transaction = await sequelize.transaction();
 
     try {
       const UserId = req.user.id;
-      const {
-        fullName,
-        phoneNumber,
-        address,
-        linkedInUrl,
-        imageUrl,
-        professionalSummary,
-        CvSkills,
-        CvLanguages,
-        CvWorkExperiences,
-        CvCertifications,
-        CvEducations,
-      } = req.body;
 
-      assertRequiredArray(req.body, "CvSkills");
-      assertRequiredArray(req.body, "CvLanguages");
-      assertRequiredArray(req.body, "CvWorkExperiences");
-      assertRequiredArray(req.body, "CvCertifications");
-      assertRequiredArray(req.body, "CvEducations");
+      validateProfilePayload(req.body);
+
+      const existingProfile = await UserProfile.findOne({
+        where: { UserId },
+        transaction,
+      });
+
+      if (existingProfile) {
+        throw new AppError(errorName.BadRequest, "Profile already exists");
+      }
 
       const userProfile = await UserProfile.create(
-        { UserId, fullName, phoneNumber, address, linkedInUrl, imageUrl, professionalSummary },
+        pickProfilePayload(req.body, UserId),
         { transaction },
       );
 
-      const cvSkills = await CvSkill.bulkCreate(
-        CvSkills.map((skill) => ({ ...skill, UserId })),
-        { transaction, validate: true },
-      );
-
-      const cvLanguages = await CvLanguage.bulkCreate(
-        CvLanguages.map((language) => ({ ...language, UserId })),
-        { transaction, validate: true },
-      );
-
-      const cvWorkExperiences = await CvWorkExperience.bulkCreate(
-        CvWorkExperiences.map((workExperience) => ({ ...workExperience, UserId })),
-        { transaction, validate: true },
-      );
-
-      const cvCertifications = await CvCertification.bulkCreate(
-        CvCertifications.map((certification) => ({ ...certification, UserId })),
-        { transaction, validate: true },
-      );
-
-      const cvEducations = await CvEducation.bulkCreate(
-        CvEducations.map((education) => ({ ...education, UserId })),
-        { transaction, validate: true },
-      );
+      const cvCollections = await createCvCollections(req.body, UserId, transaction);
 
       await transaction.commit();
 
       res.status(201).json({
         userProfile,
-        CvSkills: cvSkills,
-        CvLanguages: cvLanguages,
-        CvWorkExperiences: cvWorkExperiences,
-        CvCertifications: cvCertifications,
-        CvEducations: cvEducations,
+        ...cvCollections,
+      });
+    } catch (error) {
+      await transaction.rollback();
+      next(error);
+    }
+  }
+
+  static async updateProfile(req, res, next) {
+    const transaction = await sequelize.transaction();
+
+    try {
+      const UserId = req.user.id;
+
+      validateProfilePayload(req.body);
+
+      const userProfile = await UserProfile.findOne({
+        where: { UserId },
+        transaction,
+      });
+
+      if (!userProfile) {
+        throw new AppError(errorName.NotFound, "Profile not found");
+      }
+
+      await userProfile.update(pickProfilePayload(req.body, UserId), { transaction });
+
+      await Promise.all([
+        CvSkill.destroy({ where: { UserId }, transaction }),
+        CvLanguage.destroy({ where: { UserId }, transaction }),
+        CvWorkExperience.destroy({ where: { UserId }, transaction }),
+        CvCertification.destroy({ where: { UserId }, transaction }),
+        CvEducation.destroy({ where: { UserId }, transaction }),
+      ]);
+
+      const cvCollections = await createCvCollections(req.body, UserId, transaction);
+
+      await transaction.commit();
+
+      res.status(200).json({
+        userProfile,
+        ...cvCollections,
       });
     } catch (error) {
       await transaction.rollback();
