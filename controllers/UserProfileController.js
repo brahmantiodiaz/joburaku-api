@@ -76,6 +76,30 @@ async function createCvCollections(body, UserId, transaction) {
   };
 }
 
+async function getCvCollections(UserId) {
+  const [
+    cvSkills,
+    cvLanguages,
+    cvWorkExperiences,
+    cvCertifications,
+    cvEducations,
+  ] = await Promise.all([
+    CvSkill.findAll({ where: { UserId }, order: [["id", "ASC"]] }),
+    CvLanguage.findAll({ where: { UserId }, order: [["id", "ASC"]] }),
+    CvWorkExperience.findAll({ where: { UserId }, order: [["id", "ASC"]] }),
+    CvCertification.findAll({ where: { UserId }, order: [["id", "ASC"]] }),
+    CvEducation.findAll({ where: { UserId }, order: [["id", "ASC"]] }),
+  ]);
+
+  return {
+    CvSkills: cvSkills,
+    CvLanguages: cvLanguages,
+    CvWorkExperiences: cvWorkExperiences,
+    CvCertifications: cvCertifications,
+    CvEducations: cvEducations,
+  };
+}
+
 function validateProfilePayload(body) {
   assertRequiredArray(body, "CvSkills");
   assertRequiredArray(body, "CvLanguages");
@@ -85,6 +109,29 @@ function validateProfilePayload(body) {
 }
 
 class UserProfileController {
+  static async getProfile(req, res, next) {
+    try {
+      const UserId = req.user.id;
+
+      const userProfile = await UserProfile.findOne({
+        where: { UserId },
+      });
+
+      if (!userProfile) {
+        throw new AppError(errorName.NotFound, "Profile not found");
+      }
+
+      const cvCollections = await getCvCollections(UserId);
+
+      res.status(200).json({
+        userProfile,
+        ...cvCollections,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async createProfile(req, res, next) {
     const transaction = await sequelize.transaction();
 
