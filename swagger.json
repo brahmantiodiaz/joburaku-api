@@ -1,0 +1,3172 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Joburaku API",
+		"version": "1.0.0",
+		"description": "API documentation for Joburaku, an AI career assistant for job application tracking, ATS CV generation, and interview preparation."
+	},
+	"servers": [
+		{
+			"url": "https://dev.taulikha.site/joburaku/api",
+			"description": "Development deployment server"
+		},
+		{
+			"url": "http://localhost:3000",
+			"description": "Local development server"
+		}
+	],
+	"tags": [
+		{
+			"name": "Auth",
+			"description": "Authentication, account, Google login, and reset password endpoints"
+		},
+		{
+			"name": "Profile",
+			"description": "Career profile and CV master data endpoints"
+		},
+		{
+			"name": "Applications",
+			"description": "Job application tracker endpoints"
+		},
+		{
+			"name": "Generated CV",
+			"description": "AI generated ATS CV endpoints"
+		},
+		{
+			"name": "Interview Questions",
+			"description": "AI interview preparation endpoints"
+		}
+	],
+	"components": {
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		},
+		"schemas": {
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string",
+						"example": "Internal server error"
+					}
+				}
+			},
+			"MessageResponse": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string",
+						"example": "Operation success"
+					}
+				}
+			},
+			"RegisterRequest": {
+				"type": "object",
+				"required": ["name", "email", "username", "password"],
+				"properties": {
+					"name": {
+						"type": "string",
+						"example": "Brahmantio Diaz"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "brahmantio@mail.com"
+					},
+					"username": {
+						"type": "string",
+						"example": "brahmantiodiaz"
+					},
+					"password": {
+						"type": "string",
+						"example": "password123"
+					}
+				}
+			},
+			"RegisterResponse": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"name": {
+						"type": "string",
+						"example": "Brahmantio Diaz"
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "brahmantio@mail.com"
+					},
+					"username": {
+						"type": "string",
+						"example": "brahmantiodiaz"
+					}
+				}
+			},
+			"LoginRequest": {
+				"type": "object",
+				"required": ["email", "password"],
+				"properties": {
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "brahmantio@mail.com"
+					},
+					"password": {
+						"type": "string",
+						"example": "password123"
+					}
+				}
+			},
+			"LoginResponse": {
+				"type": "object",
+				"properties": {
+					"access_token": {
+						"type": "string",
+						"example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+					}
+				}
+			},
+			"CurrentUser": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"email": {
+						"type": "string",
+						"example": "brahmantio@mail.com"
+					},
+					"username": {
+						"type": "string",
+						"example": "brahmantiodiaz"
+					}
+				}
+			},
+			"UpdateNameRequest": {
+				"type": "object",
+				"required": ["name"],
+				"properties": {
+					"name": {
+						"type": "string",
+						"example": "Aulia Brahmantio Diaz"
+					}
+				}
+			},
+			"UpdatePasswordRequest": {
+				"type": "object",
+				"required": ["oldPassword", "newPassword"],
+				"properties": {
+					"oldPassword": {
+						"type": "string",
+						"example": "password123"
+					},
+					"newPassword": {
+						"type": "string",
+						"example": "newpassword123"
+					}
+				}
+			},
+			"EmailRequest": {
+				"type": "object",
+				"required": ["email"],
+				"properties": {
+					"email": {
+						"type": "string",
+						"format": "email",
+						"example": "brahmantio@mail.com"
+					}
+				}
+			},
+			"ResetPasswordRequest": {
+				"type": "object",
+				"required": ["token", "newPassword"],
+				"properties": {
+					"token": {
+						"type": "string",
+						"example": "7d7fcf0502e0a9d..."
+					},
+					"newPassword": {
+						"type": "string",
+						"example": "newpassword123"
+					}
+				}
+			},
+			"CheckResetPasswordTokenRequest": {
+				"type": "object",
+				"required": ["token"],
+				"properties": {
+					"token": {
+						"type": "string",
+						"example": "7d7fcf0502e0a9d..."
+					}
+				}
+			},
+			"UserProfile": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"fullName": {
+						"type": "string",
+						"example": "Aulia Brahmantio Diaz"
+					},
+					"phoneNumber": {
+						"type": "string",
+						"example": "081295264627"
+					},
+					"address": {
+						"type": "string",
+						"example": "Jakarta"
+					},
+					"linkedInUrl": {
+						"type": "string",
+						"example": "https://www.linkedin.com/in/auliabrahmantiodiaz/"
+					},
+					"imageUrl": {
+						"type": "string",
+						"nullable": true,
+						"example": "https://res.cloudinary.com/demo/image/upload/profile.jpg"
+					},
+					"professionalSummary": {
+						"type": "string",
+						"example": "Versatile and results-driven Full Stack Developer..."
+					},
+					"targetRole": {
+						"type": "string",
+						"example": "Full Stack Developer"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"CvSkill": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"name": {
+						"type": "string",
+						"example": "React"
+					},
+					"category": {
+						"type": "string",
+						"example": "Frontend"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"CvLanguage": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"language": {
+						"type": "string",
+						"example": "English"
+					},
+					"level": {
+						"type": "string",
+						"enum": [
+							"Beginner",
+							"Intermediate",
+							"Advanced",
+							"Fluent",
+							"Native"
+						],
+						"example": "Intermediate"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"CvWorkExperience": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"companyName": {
+						"type": "string",
+						"example": "PT Example Indonesia"
+					},
+					"position": {
+						"type": "string",
+						"example": "Full Stack Developer"
+					},
+					"startDate": {
+						"type": "string",
+						"format": "date",
+						"example": "2024-01-01"
+					},
+					"endDate": {
+						"type": "string",
+						"format": "date",
+						"nullable": true,
+						"example": "2025-01-01"
+					},
+					"isCurrent": {
+						"type": "boolean",
+						"example": false
+					},
+					"description": {
+						"type": "string",
+						"example": "Built web applications using React and Express."
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"CvCertification": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"name": {
+						"type": "string",
+						"example": "Full Stack JavaScript Bootcamp"
+					},
+					"issuer": {
+						"type": "string",
+						"example": "Hacktiv8"
+					},
+					"issuedDate": {
+						"type": "string",
+						"format": "date",
+						"example": "2026-05-01"
+					},
+					"credentialUrl": {
+						"type": "string",
+						"example": "https://example.com/certificate"
+					},
+					"description": {
+						"type": "string",
+						"example": "Full stack web development certification."
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"CvEducation": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"schoolName": {
+						"type": "string",
+						"example": "Universitas Indonesia"
+					},
+					"degree": {
+						"type": "string",
+						"example": "Bachelor"
+					},
+					"fieldOfStudy": {
+						"type": "string",
+						"example": "Information Systems"
+					},
+					"score": {
+						"type": "string",
+						"example": "3.75"
+					},
+					"startDate": {
+						"type": "string",
+						"format": "date",
+						"example": "2019-08-01"
+					},
+					"endDate": {
+						"type": "string",
+						"format": "date",
+						"example": "2023-08-01"
+					},
+					"description": {
+						"type": "string",
+						"example": "Focused on software engineering."
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"ProfileRequest": {
+				"type": "object",
+				"required": [
+					"fullName",
+					"skills",
+					"languages",
+					"workExperiences",
+					"certifications",
+					"educations"
+				],
+				"properties": {
+					"fullName": {
+						"type": "string",
+						"example": "Aulia Brahmantio Diaz"
+					},
+					"phoneNumber": {
+						"type": "string",
+						"example": "081295264627"
+					},
+					"address": {
+						"type": "string",
+						"example": "Jakarta"
+					},
+					"linkedInUrl": {
+						"type": "string",
+						"example": "https://www.linkedin.com/in/auliabrahmantiodiaz/"
+					},
+					"imageUrl": {
+						"type": "string",
+						"example": "https://res.cloudinary.com/demo/image/upload/profile.jpg"
+					},
+					"professionalSummary": {
+						"type": "string",
+						"example": "Junior Full Stack Developer with experience using React, Express, Sequelize, and PostgreSQL."
+					},
+					"targetRole": {
+						"type": "string",
+						"example": "Full Stack Developer"
+					},
+					"skills": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["name"],
+							"properties": {
+								"name": {
+									"type": "string",
+									"example": "React"
+								},
+								"category": {
+									"type": "string",
+									"example": "Frontend"
+								}
+							}
+						}
+					},
+					"languages": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["language"],
+							"properties": {
+								"language": {
+									"type": "string",
+									"example": "English"
+								},
+								"level": {
+									"type": "string",
+									"enum": [
+										"Beginner",
+										"Intermediate",
+										"Advanced",
+										"Fluent",
+										"Native"
+									],
+									"example": "Intermediate"
+								}
+							}
+						}
+					},
+					"workExperiences": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["companyName", "position"],
+							"properties": {
+								"companyName": {
+									"type": "string",
+									"example": "PT Example Indonesia"
+								},
+								"position": {
+									"type": "string",
+									"example": "Full Stack Developer"
+								},
+								"startDate": {
+									"type": "string",
+									"format": "date",
+									"example": "2024-01-01"
+								},
+								"endDate": {
+									"type": "string",
+									"format": "date",
+									"example": "2025-01-01"
+								},
+								"isCurrent": {
+									"type": "boolean",
+									"example": false
+								},
+								"description": {
+									"type": "string",
+									"example": "Built REST APIs and React dashboards."
+								}
+							}
+						}
+					},
+					"certifications": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["name"],
+							"properties": {
+								"name": {
+									"type": "string",
+									"example": "Full Stack JavaScript Bootcamp"
+								},
+								"issuer": {
+									"type": "string",
+									"example": "Hacktiv8"
+								},
+								"issuedDate": {
+									"type": "string",
+									"format": "date",
+									"example": "2026-05-01"
+								},
+								"credentialUrl": {
+									"type": "string",
+									"example": "https://example.com/certificate"
+								},
+								"description": {
+									"type": "string",
+									"example": "Intensive full stack training."
+								}
+							}
+						}
+					},
+					"educations": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"required": ["schoolName"],
+							"properties": {
+								"schoolName": {
+									"type": "string",
+									"example": "Universitas Indonesia"
+								},
+								"degree": {
+									"type": "string",
+									"example": "Bachelor"
+								},
+								"fieldOfStudy": {
+									"type": "string",
+									"example": "Information Systems"
+								},
+								"score": {
+									"type": "string",
+									"example": "3.75"
+								},
+								"startDate": {
+									"type": "string",
+									"format": "date",
+									"example": "2019-08-01"
+								},
+								"endDate": {
+									"type": "string",
+									"format": "date",
+									"example": "2023-08-01"
+								},
+								"description": {
+									"type": "string",
+									"example": "Focused on software engineering."
+								}
+							}
+						}
+					}
+				}
+			},
+			"ProfileResponse": {
+				"type": "object",
+				"properties": {
+					"userProfile": {
+						"$ref": "#/components/schemas/UserProfile"
+					},
+					"skills": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/CvSkill"
+						}
+					},
+					"languages": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/CvLanguage"
+						}
+					},
+					"workExperiences": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/CvWorkExperience"
+						}
+					},
+					"certifications": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/CvCertification"
+						}
+					},
+					"educations": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/CvEducation"
+						}
+					}
+				}
+			},
+			"JobApplicationRequest": {
+				"type": "object",
+				"required": ["companyName", "position", "jobDescription"],
+				"properties": {
+					"companyName": {
+						"type": "string",
+						"example": "Tokopedia"
+					},
+					"position": {
+						"type": "string",
+						"example": "Frontend Developer"
+					},
+					"jobDescription": {
+						"type": "string",
+						"example": "We are looking for a React Developer with REST API experience."
+					},
+					"jobUrl": {
+						"type": "string",
+						"example": "https://example.com/jobs/frontend-developer"
+					},
+					"location": {
+						"type": "string",
+						"example": "Jakarta"
+					},
+					"salaryRange": {
+						"type": "string",
+						"example": "Rp8.000.000 - Rp12.000.000"
+					},
+					"status": {
+						"type": "string",
+						"enum": [
+							"Wishlist",
+							"Applied",
+							"Interview",
+							"Offering",
+							"Rejected",
+							"Accepted"
+						],
+						"example": "Applied"
+					},
+					"appliedDate": {
+						"type": "string",
+						"format": "date",
+						"example": "2026-05-22"
+					},
+					"notes": {
+						"type": "string",
+						"example": "Applied via LinkedIn."
+					}
+				}
+			},
+			"JobApplication": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/JobApplicationRequest"
+					},
+					{
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "integer",
+								"example": 1
+							},
+							"UserId": {
+								"type": "integer",
+								"example": 1
+							},
+							"createdAt": {
+								"type": "string",
+								"format": "date-time"
+							},
+							"updatedAt": {
+								"type": "string",
+								"format": "date-time"
+							}
+						}
+					}
+				]
+			},
+			"UpdateApplicationStatusRequest": {
+				"type": "object",
+				"required": ["status"],
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": [
+							"Wishlist",
+							"Applied",
+							"Interview",
+							"Offering",
+							"Rejected",
+							"Accepted"
+						],
+						"example": "Interview"
+					}
+				}
+			},
+			"JobSearchItem": {
+				"type": "object",
+				"properties": {
+					"externalId": {
+						"type": "string",
+						"example": "abc123"
+					},
+					"companyName": {
+						"type": "string",
+						"example": "Tokopedia"
+					},
+					"position": {
+						"type": "string",
+						"example": "Frontend Developer"
+					},
+					"jobDescription": {
+						"type": "string",
+						"example": "Job description text..."
+					},
+					"jobUrl": {
+						"type": "string",
+						"example": "https://example.com/apply"
+					},
+					"location": {
+						"type": "string",
+						"example": "Jakarta, Indonesia"
+					},
+					"salaryRange": {
+						"type": "string",
+						"nullable": true,
+						"example": "Rp8.000.000 - Rp12.000.000"
+					},
+					"source": {
+						"type": "string",
+						"example": "LinkedIn"
+					},
+					"employmentType": {
+						"type": "string",
+						"example": "FULLTIME"
+					},
+					"isRemote": {
+						"type": "boolean",
+						"example": false
+					},
+					"postedAt": {
+						"type": "string",
+						"example": "2026-05-22"
+					},
+					"companyLogo": {
+						"type": "string",
+						"nullable": true,
+						"example": "https://example.com/logo.png"
+					}
+				}
+			},
+			"JobSearchResponse": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string",
+						"example": "Jobs fetched successfully"
+					},
+					"query": {
+						"type": "string",
+						"example": "Frontend Developer"
+					},
+					"cursor": {
+						"type": "string",
+						"nullable": true,
+						"example": "next-cursor"
+					},
+					"total": {
+						"type": "integer",
+						"example": 10
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/JobSearchItem"
+						}
+					}
+				}
+			},
+			"GeneratedCV": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"JobApplicationId": {
+						"type": "integer",
+						"example": 1
+					},
+					"title": {
+						"type": "string",
+						"example": "CV Frontend Developer - Tokopedia"
+					},
+					"atsScore": {
+						"type": "integer",
+						"example": 82
+					},
+					"matchScore": {
+						"type": "integer",
+						"example": 88
+					},
+					"keywordSuggestions": {
+						"type": "string",
+						"example": "React, REST API, Git, Responsive Design"
+					},
+					"missingKeywords": {
+						"type": "string",
+						"example": "TypeScript, Unit Testing"
+					},
+					"summary": {
+						"type": "string",
+						"example": "Junior Full Stack Developer with experience building responsive web applications."
+					},
+					"skills": {
+						"type": "string",
+						"example": "React, Express, PostgreSQL, Sequelize"
+					},
+					"experience": {
+						"type": "string",
+						"example": "Built API and React features..."
+					},
+					"education": {
+						"type": "string",
+						"example": "Hacktiv8 Full Stack JavaScript"
+					},
+					"certifications": {
+						"type": "string",
+						"example": "Full Stack JavaScript Bootcamp"
+					},
+					"fullContent": {
+						"type": "string",
+						"example": "Professional Summary...\nSkills...\nExperience..."
+					},
+					"contentJson": {
+						"type": "object",
+						"additionalProperties": true
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"InterviewGenerateRequest": {
+				"type": "object",
+				"required": ["category"],
+				"properties": {
+					"category": {
+						"type": "string",
+						"enum": ["Technical", "Behavioral", "HR", "ProjectBased"],
+						"example": "Technical"
+					}
+				}
+			},
+			"InterviewQuestion": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"example": 1
+					},
+					"UserId": {
+						"type": "integer",
+						"example": 1
+					},
+					"JobApplicationId": {
+						"type": "integer",
+						"example": 1
+					},
+					"category": {
+						"type": "string",
+						"enum": ["Technical", "Behavioral", "HR", "ProjectBased"],
+						"example": "Technical"
+					},
+					"question": {
+						"type": "string",
+						"example": "How do you manage state in React?"
+					},
+					"suggestedAnswer": {
+						"type": "string",
+						"example": "I usually use useState for local state and Redux for global state..."
+					},
+					"userAnswer": {
+						"type": "string",
+						"nullable": true,
+						"example": "I use useState and Redux Toolkit depending on the scope."
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"UpdateInterviewAnswerRequest": {
+				"type": "object",
+				"required": ["userAnswer"],
+				"properties": {
+					"userAnswer": {
+						"type": "string",
+						"example": "I use React state based on component scope and extract global state when needed."
+					}
+				}
+			}
+		}
+	},
+	"paths": {
+		"/": {
+			"get": {
+				"summary": "Health check",
+				"tags": ["Auth"],
+				"responses": {
+					"200": {
+						"description": "API is running",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/register": {
+			"post": {
+				"summary": "Register user",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RegisterRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "User registered",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RegisterResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/login": {
+			"post": {
+				"summary": "Login user",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/LoginRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Login success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/current-user": {
+			"get": {
+				"summary": "Get current authenticated user",
+				"tags": ["Auth"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Current user",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CurrentUser"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/google-login": {
+			"get": {
+				"summary": "Login or register using Google ID token",
+				"tags": ["Auth"],
+				"parameters": [
+					{
+						"name": "accessgoogle",
+						"in": "header",
+						"required": true,
+						"schema": {
+							"type": "string"
+						},
+						"description": "Google ID token from frontend Google login"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Google login success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/LoginResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/account/name": {
+			"patch": {
+				"summary": "Update account name",
+				"tags": ["Auth"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateNameRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Name updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RegisterResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/account/password": {
+			"patch": {
+				"summary": "Update account password",
+				"tags": ["Auth"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdatePasswordRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Password updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/forgot-password": {
+			"post": {
+				"summary": "Request reset password email",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/EmailRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Reset link sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/reset-password": {
+			"post": {
+				"summary": "Reset password using reset token",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ResetPasswordRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Password reset success",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/check-reset-password-token": {
+			"post": {
+				"summary": "Validate reset password token",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CheckResetPasswordTokenRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Token valid",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/profile": {
+			"get": {
+				"summary": "Get current user profile with CV collections",
+				"tags": ["Profile"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Profile data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProfileResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Create current user profile",
+				"tags": ["Profile"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ProfileRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Profile created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProfileResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "Update current user profile",
+				"tags": ["Profile"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ProfileRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Profile updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProfileResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/profile/updateImage": {
+			"patch": {
+				"summary": "Update profile image",
+				"tags": ["Profile"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"required": ["image"],
+								"properties": {
+									"image": {
+										"type": "string",
+										"format": "binary"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Profile image updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/applications/jobs": {
+			"get": {
+				"summary": "Search jobs from JSearch API",
+				"tags": ["Applications"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "query",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						},
+						"example": "Frontend Developer"
+					},
+					{
+						"name": "cursor",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "num_pages",
+						"in": "query",
+						"schema": {
+							"type": "integer",
+							"default": 1
+						}
+					},
+					{
+						"name": "country",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"default": "id"
+						}
+					},
+					{
+						"name": "language",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"default": "ID"
+						}
+					},
+					{
+						"name": "location",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"default": "Jakarta"
+						}
+					},
+					{
+						"name": "date_posted",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"default": "all"
+						}
+					},
+					{
+						"name": "work_from_home",
+						"in": "query",
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Jobs fetched",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/JobSearchResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/applications": {
+			"get": {
+				"summary": "Get current user's job applications",
+				"tags": ["Applications"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "search",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						},
+						"example": "tokopedia"
+					},
+					{
+						"name": "status",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"enum": [
+								"Wishlist",
+								"Applied",
+								"Interview",
+								"Offering",
+								"Rejected",
+								"Accepted"
+							]
+						}
+					},
+					{
+						"name": "sort",
+						"in": "query",
+						"schema": {
+							"type": "string",
+							"enum": ["newest", "oldest"],
+							"default": "newest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Applications list",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/JobApplication"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Create job application",
+				"tags": ["Applications"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/JobApplicationRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Application created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/JobApplication"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/applications/{id}": {
+			"get": {
+				"summary": "Get job application detail",
+				"tags": ["Applications"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Resource id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Application detail",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/JobApplication"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "Update job application",
+				"tags": ["Applications"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Resource id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/JobApplicationRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Application updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/JobApplication"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "Delete job application",
+				"tags": ["Applications"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Resource id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Application deleted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/applications/{id}/status": {
+			"patch": {
+				"summary": "Update job application status",
+				"tags": ["Applications"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Resource id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateApplicationStatusRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Application status updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/JobApplication"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/applications/{id}/generated-cvs": {
+			"post": {
+				"summary": "Generate ATS CV for a job application",
+				"tags": ["Generated CV"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Job application id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Generated CV created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GeneratedCV"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"summary": "Get generated CVs by job application",
+				"tags": ["Generated CV"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Job application id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Generated CV list",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/GeneratedCV"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/generated-cvs/{id}": {
+			"get": {
+				"summary": "Get generated CV detail",
+				"tags": ["Generated CV"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Generated CV id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Generated CV detail",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GeneratedCV"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "Delete generated CV",
+				"tags": ["Generated CV"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Generated CV id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Generated CV deleted",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/generated-cvs/{id}/download": {
+			"get": {
+				"summary": "Download generated CV as PDF",
+				"tags": ["Generated CV"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Generated CV id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Generated CV PDF file",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/applications/{id}/interview-questions": {
+			"post": {
+				"summary": "Generate interview questions for a job application",
+				"tags": ["Interview Questions"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Job application id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/InterviewGenerateRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Interview questions created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/InterviewQuestion"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"summary": "Get interview questions by job application",
+				"tags": ["Interview Questions"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Job application id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Interview questions list",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/InterviewQuestion"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/interview-questions/{id}/answer": {
+			"patch": {
+				"summary": "Update user answer for an interview question",
+				"tags": ["Interview Questions"],
+				"security": [
+					{
+						"bearerAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"description": "Interview question id",
+						"schema": {
+							"type": "integer",
+							"example": 1
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateInterviewAnswerRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Interview answer updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/InterviewQuestion"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Not Found",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -8,24 +8,43 @@
 		"dev": "nodemon ./bin/www",
 		"migrate": "npx sequelize-cli db:migrate",
 		"seed": "npx sequelize-cli db:seed:all",
-		"undo": "npx sequelize-cli db:migrate:undo"
+		"undo": "npx sequelize-cli db:migrate:undo",
+		"test": "jest --runInBand --verbose --detectOpenHandles --forceExit --coverage"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"type": "commonjs",
 	"dependencies": {
+		"@google/genai": "^2.4.0",
+		"axios": "^1.16.1",
 		"bcryptjs": "^3.0.3",
+		"cloudinary": "^2.10.0",
 		"cors": "^2.8.6",
 		"dotenv": "^17.4.2",
+		"ejs": "^5.0.2",
 		"express": "^5.2.1",
+		"google-auth-library": "^10.6.2",
 		"jsonwebtoken": "^9.0.3",
+		"multer": "^2.1.1",
+		"nodemailer": "^8.0.7",
 		"pg": "^8.21.0",
-		"sequelize": "^6.37.8"
+		"puppeteer": "^25.0.4",
+		"sequelize": "^6.37.8",
+		"swagger-ui-express": "^5.0.1"
 	},
 	"devDependencies": {
 		"jest": "^30.4.2",
 		"sequelize-cli": "^6.6.5",
 		"supertest": "^7.2.2"
+	},
+	"jest": {
+		"testEnvironment": "node",
+		"coveragePathIgnorePatterns": [
+			"/node_modules/",
+			"server/helpers/gemini.js",
+			"server/config/",
+			"server/models/index.js"
+		]
 	}
 }

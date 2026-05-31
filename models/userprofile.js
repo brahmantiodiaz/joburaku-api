@@ -37,6 +37,11 @@ module.exports = (sequelize, DataTypes) => {
 				validate: urlOrEmpty("imageUrl"),
 			},
 			professionalSummary: DataTypes.TEXT,
+			targetRole: {
+				type: DataTypes.STRING(100),
+				allowNull: false,
+				validate: required("targetRole"),
+			},
 		},
 		{ sequelize, modelName: "UserProfile" },
 	);

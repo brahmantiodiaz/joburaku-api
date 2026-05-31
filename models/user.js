@@ -7,11 +7,24 @@ module.exports = (sequelize, DataTypes) => {
 	class User extends Model {
 		static associate(models) {
 			User.hasOne(models.UserProfile, { foreignKey: "UserId" });
+
 			User.hasMany(models.CvEducation, { foreignKey: "UserId" });
 			User.hasMany(models.CvSkill, { foreignKey: "UserId" });
 			User.hasMany(models.CvLanguage, { foreignKey: "UserId" });
 			User.hasMany(models.CvWorkExperience, { foreignKey: "UserId" });
 			User.hasMany(models.CvCertification, { foreignKey: "UserId" });
+
+			User.hasMany(models.JobApplication, {
+				foreignKey: "UserId",
+			});
+
+			User.hasMany(models.GeneratedCV, {
+				foreignKey: "UserId",
+			});
+
+			User.hasMany(models.InterviewQuestion, {
+				foreignKey: "UserId",
+			});
 		}
 	}
 
@@ -44,6 +57,12 @@ module.exports = (sequelize, DataTypes) => {
 					len: { args: [5], msg: "Password minimum 5 characters" },
 					...required("Password"),
 				},
+			},
+			resetPasswordToken: {
+				type: DataTypes.STRING,
+			},
+			resetPasswordExpiredAt: {
+				type: DataTypes.DATE,
 			},
 		},
 		{ sequelize, modelName: "User" },

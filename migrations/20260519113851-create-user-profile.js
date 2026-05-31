@@ -23,6 +23,7 @@ module.exports = {
 			linkedInUrl: { type: Sequelize.STRING(255) },
 			imageUrl: { type: Sequelize.STRING(255) },
 			professionalSummary: { type: Sequelize.TEXT },
+			targetRole: { type: Sequelize.STRING(100), allowNull: false },
 			createdAt: { allowNull: false, type: Sequelize.DATE },
 			updatedAt: { allowNull: false, type: Sequelize.DATE },
 		});
