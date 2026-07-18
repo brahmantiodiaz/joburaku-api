@@ -1,5 +1,9 @@
 require("dotenv").config();
 
+const databaseSslEnabled = ["true", "1", "yes"].includes(
+	String(process.env.DB_SSL || "").toLowerCase(),
+);
+
 module.exports = {
 	development: {
 		username: process.env.DB_USERNAME,
@@ -20,11 +24,14 @@ module.exports = {
 	production: {
 		use_env_variable: "DATABASE_URL",
 		dialect: "postgres",
-		dialectOptions: {
-			ssl: {
-				require: true,
-				rejectUnauthorized: false,
-			},
-		},
+		logging: false,
+		dialectOptions: databaseSslEnabled
+			? {
+					ssl: {
+						require: true,
+						rejectUnauthorized: false,
+					},
+				}
+			: {},
 	},
 };
